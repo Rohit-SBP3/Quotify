@@ -7,7 +7,7 @@ import com.google.gson.Gson
 
 object QuoteDataManager {
 
-    var quoteList = emptyList<Quote?>()
+    var quoteList = emptyList<Quote>()
     var currentQuoteIndex = 0
     var isDataLoaded =  mutableStateOf(false)
     var currentScreen = mutableStateOf(Screen.LISTING)
@@ -21,30 +21,30 @@ object QuoteDataManager {
         inputStream.close()
         val json = String(buffer,Charsets.UTF_8)
         val gson = Gson()
-        quoteList = gson.fromJson(json, Array<Quote?>::class.java).toList()
+        quoteList = gson.fromJson(json, Array<Quote>::class.java).toList()
         isDataLoaded.value = true
     }
 
-    fun populateQuotes(quotes: List<Quote?>){
+    fun populateQuotes(quotes: List<Quote>){
         quoteList = quotes
     }
 
-    fun getCurrentQuote(): Quote? {
+    fun fetchCurrentQuote(): Quote? {
         currentQuote = quoteList[currentQuoteIndex]
         return currentQuote
     }
 
-    fun getPreviousQuote(): Quote? {
+    fun getPreviousQuote(): Quote {
         if(currentQuoteIndex == 0) return quoteList[currentQuoteIndex]
         return quoteList[--currentQuoteIndex]
     }
 
-    fun getNextQuote(): Quote? {
+    fun getNextQuote(): Quote {
         if(currentQuoteIndex == quoteList.size-1) return quoteList[currentQuoteIndex]
         return quoteList[++currentQuoteIndex]
     }
 
-    fun switchScreen(quote: Quote?){
+    fun switchScreen(quote: Quote){
         if (currentScreen.value == Screen.LISTING){
             currentQuote = quote
             currentScreen.value = Screen.DETAIL

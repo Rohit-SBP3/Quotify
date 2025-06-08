@@ -34,7 +34,7 @@ import com.example.quotify.model.Quote
 fun QuoteDetailScreen(quote: Quote){
 
     BackHandler {
-        QuoteDataManager.switchScreen(null)
+        QuoteDataManager.switchScreen(quote)
     }
 
     Box(
