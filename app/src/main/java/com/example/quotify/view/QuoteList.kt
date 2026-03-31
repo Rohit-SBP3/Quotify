@@ -1,4 +1,4 @@
-package com.example.quotify.screens
+package com.example.quotify.view
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items

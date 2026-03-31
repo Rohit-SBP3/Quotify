@@ -1,27 +1,38 @@
-package com.example.quotify
+package com.example.quotify.viewmodel
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
+import com.example.quotify.Screen
 import com.example.quotify.model.Quote
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-object QuoteDataManager {
+class MainViewModel(val context: Context): ViewModel() {
 
     var quoteList = emptyList<Quote>()
-    var currentQuoteIndex = 0
+    private var currentQuoteIndex: Int = 0
     var isDataLoaded =  mutableStateOf(false)
     var currentScreen = mutableStateOf(Screen.LISTING)
     var currentQuote: Quote? = null
 
-    fun loadAssetsFromFile(context: Context, fileName: String){
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            quoteList = loadQuoteFromAssets("quotes.json")
+        }
+    }
+
+    private fun loadQuoteFromAssets(fileName: String): List<Quote> {
         val inputStream = context.assets.open(fileName)
         val size: Int = inputStream.available()
         val buffer = ByteArray(size)
         inputStream.read(buffer)
         inputStream.close()
-        val json = String(buffer,Charsets.UTF_8)
+        val json = String(buffer, Charsets.UTF_8)
         val gson = Gson()
-        quoteList = gson.fromJson(json, Array<Quote>::class.java).toList()
+        return gson.fromJson(json, Array<Quote>::class.java).toList()
         isDataLoaded.value = true
     }
 
@@ -51,5 +62,8 @@ object QuoteDataManager {
         }
         else currentScreen.value = Screen.LISTING
     }
+
+
+
 
 }

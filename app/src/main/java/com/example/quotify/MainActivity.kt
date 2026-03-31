@@ -10,37 +10,39 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.quotify.screens.QuoteDetailScreen
-import com.example.quotify.screens.QuoteList
-import com.example.quotify.screens.QuoteListScreen
+import androidx.lifecycle.ViewModelProvider
+import com.example.quotify.view.QuoteDetailScreen
+import com.example.quotify.view.QuoteListScreen
 import com.example.quotify.ui.theme.QuotifyTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.quotify.viewmodel.MainViewModel
+import com.example.quotify.viewmodel.MainViewModelFactory
 
 class MainActivity : ComponentActivity() {
+
+    lateinit var mainViewModel: MainViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        CoroutineScope(Dispatchers.IO).launch {
-            QuoteDataManager.loadAssetsFromFile(applicationContext, "quotes.json")
-        }
+
+        mainViewModel = ViewModelProvider(this, MainViewModelFactory(application))[MainViewModel::class.java]
+
         setContent {
             QuotifyTheme {
-                App()
+                App(mainViewModel)
             }
         }
     }
 }
 
 @Composable
-fun App(){
-    if(QuoteDataManager.isDataLoaded.value){
-        if (QuoteDataManager.currentScreen.value == Screen.LISTING){
-            QuoteListScreen(data = QuoteDataManager.quoteList.toTypedArray()) {
-                QuoteDataManager.switchScreen(it)
+fun App(mainViewModel: MainViewModel) {
+    if(mainViewModel.isDataLoaded.value){
+        if (mainViewModel.currentScreen.value == Screen.LISTING){
+            QuoteListScreen(data = mainViewModel.quoteList.toTypedArray()) {
+                mainViewModel.switchScreen(it)
             }
         }else{
-            QuoteDataManager.currentQuote?.let { QuoteDetailScreen(it) }
+            mainViewModel.currentQuote?.let { QuoteDetailScreen(mainViewModel,it) }
         }
     }else{
         Box(
@@ -51,6 +53,12 @@ fun App(){
         }
     }
 }
+
+// LiveData
+/*
+*
+*
+* */
 
 enum class Screen{
     LISTING,
